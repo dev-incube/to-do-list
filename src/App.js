@@ -1,109 +1,84 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import _ from 'lodash'
 import Header from './components/Header'
 import List from './components/List'
 import './App.css';
 
-class App extends Component {
-  state = {
-    list: [{
-      id: 1,
-      title: 'Task 1',
-      isCompleted: true,
-    }, {
-      id: 2,
-      title: 'Task 2',
-      isCompleted: false,
-    }, {
-      id: 3,
-      title: 'Task 3',
-      isCompleted: false,
-    }, {
-      id: 4,
-      title: 'Task 4',
-      isCompleted: true,
-    }],
-    showCompleted: false,
-    lastId: 5,
+function App() {
+  const [list, setList] = useState([{
+    id: 1,
+    title: 'Task 1',
+    isCompleted: false,
+  }])
+  const [showCompleted, setShowCompleted] = useState(false)
+  const [lastId, setLastId] = useState(2)
+
+  const onToggleListItem = (itemId, checked) => {
+    const newList = _.cloneDeep(list)
+    const selectedItem = newList.find((item) => item.id === itemId)
+    selectedItem.isCompleted = checked
+    setList(newList)
   }
 
-  onToggleListItem = (itemId, checked) => {
-    console.log(itemId, checked)
-    this.setState(({ list }) => {
-      const newList = _.cloneDeep(list)
-      const selectedItem = newList.find((item) => item.id === itemId)
-      selectedItem.isCompleted = checked
-      return { list: newList }
-    })
+  const onToggleCompletedItem = () => {
+    setShowCompleted(!showCompleted)
   }
 
-  onToggleCompletedItem = () => {
-    // this.setState({ showCompleted: !this.state.showCompleted })
-    this.setState(({ showCompleted }) => ({ showCompleted: !showCompleted }))
+  const onCreateNewItem = () => {
+    setList(
+      [...list, { id: lastId, title: `Task ${lastId}`, isCompleted: false }]
+    )
+    setLastId(lastId + 1)
   }
 
-  onCreateNewItem = () => {
-    this.setState(({ list, lastId }) => ({
-      list: [...list, { id: lastId, title: `Task ${lastId}`, isCompleted: false }],
-      lastId: lastId + 1,
-    }))
+  const onEditTask = (itemId, value) => {
+    const newList = _.cloneDeep(list)
+    const selectedItem = newList.find((item) => item.id === itemId)
+    selectedItem.title = value
+    setList(newList)
   }
 
-  onEditTask = (itemId, value) => {
-    console.log(itemId, value)
-    this.setState(({ list }) => {
-      const newList = _.cloneDeep(list)
-      const selectedItem = newList.find((item) => item.id === itemId)
-      selectedItem.title = value
-      return { list: newList }
-    })
+  const onDeleteTask = (itemId) => {
+    const newList = list.filter((item) => item.id !== itemId)
+    setList(newList)
   }
 
-  onDeleteTask = (itemId) => {
-    console.log('del', itemId)
-    this.setState(({ list }) => {
-      const newList = list.filter((item) => item.id !== itemId)
-      return {
-        list: newList
-      }
-    })
-  }
+  const completedList = list.filter((item) => item.isCompleted)
+  const uncompletedList = list.filter((item) => !item.isCompleted)
+  const completedItemNum = completedList.length
 
-  render() {
-    const { list, showCompleted } = this.state
-    const completedList = list.filter((item) => item.isCompleted)
-    const uncompletedList = list.filter((item) => !item.isCompleted)
-    const completedItemNum = completedList.length
-    return (
-      <div className="App">
-        <Header title="To Do List" onCreateNewItem={this.onCreateNewItem} />
+  return (
+    <div className="App">
+      <Header title="To Do List" onCreateNewItem={onCreateNewItem} />
+      {
+        completedItemNum > 0 &&
         <div style={{ display: 'flex', justifyContent: 'space-around' }}>
           <div>{completedItemNum} Completed</div>
           <div
             style={{ color: 'blue', cursor: 'pointer' }}
-            onClick={this.onToggleCompletedItem}
+            onClick={onToggleCompletedItem}
           >
             {showCompleted ? 'Hide' : 'Show'}
           </div>
         </div>
-        {
-          showCompleted &&
-          <List
-            list={completedList}
-            onToggleListItem={this.onToggleListItem}
-            onDeleteTask={this.onDeleteTask}
-            onEditTask={this.onEditTask}
-          />
-        }
+      }
+      {
+        showCompleted &&
         <List
-          list={uncompletedList}
-          onToggleListItem={this.onToggleListItem}
-          onDeleteTask={this.onDeleteTask}
-          onEditTask={this.onEditTask}
+          list={completedList}
+          onToggleListItem={onToggleListItem}
+          onDeleteTask={onDeleteTask}
+          onEditTask={onEditTask}
         />
-      </div>
-    );
-  }
+      }
+      <List
+        list={uncompletedList}
+        onToggleListItem={onToggleListItem}
+        onDeleteTask={onDeleteTask}
+        onEditTask={onEditTask}
+      />
+    </div>
+  );
 }
 
 export default App;
