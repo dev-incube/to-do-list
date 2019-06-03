@@ -1,7 +1,6 @@
 import React from 'react'
 
 const ListItem = ({ item, onToggleListItem, onDeleteTask, onEditTask }) => {
-  console.log('item', item)
   return (
     <div key={item.id} style={{ display: 'flex', justifyContent: 'space-around' }}>
       <div>

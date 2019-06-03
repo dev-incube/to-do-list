@@ -6,7 +6,7 @@ const List = ({ list, onToggleListItem, onDeleteTask, onEditTask }) => {
     <div>
       {
         list.map((item) => (
-          <ListItem item={item} onToggleListItem={onToggleListItem} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
+          <ListItem key={item.id} item={item} onToggleListItem={onToggleListItem} onDeleteTask={onDeleteTask} onEditTask={onEditTask} />
         ))
       }
     </div>
